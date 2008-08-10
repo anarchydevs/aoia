@@ -1,5 +1,7 @@
 /*=============================================================================
     Copyright (c) 2001-2003 Daniel Nuffer
+    Copyright (c) 2001-2007 Hartmut Kaiser
+    Revised 2007, Copyright (c) Tobias Schwinger
     http://spirit.sourceforge.net/
 
     Use, modification and distribution is subject to the Boost Software
@@ -9,7 +11,16 @@
 #ifndef BOOST_SPIRIT_TREE_COMMON_HPP
 #define BOOST_SPIRIT_TREE_COMMON_HPP
 
+#if !defined(BOOST_SPIRIT_USE_LIST_FOR_TREES)
 #include <vector>
+#else
+#include <list>
+#endif
+
+#if defined(BOOST_SPIRIT_USE_BOOST_ALLOCATOR_FOR_TREES)
+#include <boost/pool/pool_alloc.hpp>
+#endif
+
 #include <algorithm>
 
 #include <boost/ref.hpp>
@@ -23,13 +34,9 @@
 #include <boost/spirit/debug/debug_node.hpp>
 #endif
 
+#include <boost/spirit/tree/common_fwd.hpp>
+
 namespace boost { namespace spirit {
-
-template <typename T>
-struct tree_node;
-
-template <typename IteratorT = char const*, typename ValueT = nil_t>
-struct node_iter_data;
 
 template <typename T>
 void swap(tree_node<T>& a, tree_node<T>& b);
@@ -46,7 +53,21 @@ template <typename T>
 struct tree_node
 {
     typedef T parse_node_t;
-    typedef std::vector<tree_node<T> > children_t;
+    
+#if !defined(BOOST_SPIRIT_USE_BOOST_ALLOCATOR_FOR_TREES)
+    typedef std::allocator<tree_node<T> > allocator_type;
+#elif !defined(BOOST_SPIRIT_USE_LIST_FOR_TREES)
+    typedef boost::pool_allocator<tree_node<T> > allocator_type;
+#else
+    typedef boost::fast_pool_allocator<tree_node<T> > allocator_type;
+#endif
+
+#if !defined(BOOST_SPIRIT_USE_LIST_FOR_TREES)
+    typedef std::vector<tree_node<T>, allocator_type> children_t;
+#else
+    typedef std::list<tree_node<T>, allocator_type> children_t;
+#endif  // BOOST_SPIRIT_USE_LIST_FOR_TREES
+
     typedef typename children_t::iterator tree_iterator;
     typedef typename children_t::const_iterator const_tree_iterator;
 
@@ -220,7 +241,21 @@ struct node_val_data
     typedef
         typename boost::detail::iterator_traits<IteratorT>::value_type
         value_type;
-    typedef std::vector<value_type> container_t;
+
+#if !defined(BOOST_SPIRIT_USE_BOOST_ALLOCATOR_FOR_TREES)
+    typedef std::allocator<value_type> allocator_type;
+#elif !defined(BOOST_SPIRIT_USE_LIST_FOR_TREES)
+    typedef boost::pool_allocator<value_type> allocator_type;
+#else
+    typedef boost::fast_pool_allocator<value_type> allocator_type;
+#endif
+
+#if !defined(BOOST_SPIRIT_USE_LIST_FOR_TREES)
+    typedef std::vector<value_type, allocator_type> container_t;
+#else
+    typedef std::list<value_type, allocator_type> container_t;
+#endif
+
     typedef typename container_t::iterator iterator_t;
     typedef typename container_t::const_iterator const_iterator_t;
 
@@ -235,7 +270,7 @@ struct node_val_data
             std::copy(_first, _last, std::inserter(text, text.end()));
         }
 
-    // This constructor is for building text out of vector iterators
+    // This constructor is for building text out of iterators
     template <typename IteratorT2>
     node_val_data(IteratorT2 const& _first, IteratorT2 const& _last)
         : text(), is_root_(false), parser_id_(), value_()
@@ -247,7 +282,7 @@ struct node_val_data
         : text(_first, _last), is_root_(false), parser_id_(), value_()
         {}
 
-    // This constructor is for building text out of vector iterators
+    // This constructor is for building text out of iterators
     template <typename IteratorT2>
     node_val_data(IteratorT2 const& _first, IteratorT2 const& _last)
         : text(_first, _last), is_root_(false), parser_id_(), value_()
@@ -351,15 +386,11 @@ swap(node_iter_data<T, V>& a, node_iter_data<T, V>& b)
 }
 
 //////////////////////////////////
-template <typename ValueT = nil_t>
-class node_iter_data_factory;
-
-//////////////////////////////////
 template <typename ValueT>
 class node_iter_data_factory
 {
 public:
-    // This inner class is so that node_iter_data_factory can simluate
+    // This inner class is so that node_iter_data_factory can simulate
     // a template template parameter
     template <typename IteratorT>
     class factory
@@ -391,15 +422,11 @@ public:
 };
 
 //////////////////////////////////
-template <typename ValueT = nil_t>
-class node_val_data_factory;
-
-//////////////////////////////////
 template <typename ValueT>
 class node_val_data_factory 
 {
 public:
-    // This inner class is so that node_val_data_factory can simluate
+    // This inner class is so that node_val_data_factory can simulate
     // a template template parameter
     template <typename IteratorT>
     class factory
@@ -431,7 +458,7 @@ public:
             for (typename ContainerT::const_iterator i = nodes.begin();
                  i != i_end; ++i)
             {
-                // See docs: token_node_d or leaf_node_d cannot be used with a
+                // See docs: reduced_node_d cannot be used with a
                 // rule inside the [].
                 assert(i->children.size() == 0);
                 c.insert(c.end(), i->value.begin(), i->value.end());
@@ -441,17 +468,12 @@ public:
     };
 };
 
-
-//////////////////////////////////
-template <typename ValueT = nil_t>
-class node_all_val_data_factory;
-
 //////////////////////////////////
 template <typename ValueT>
 class node_all_val_data_factory
 {
 public:
-    // This inner class is so that node_all_val_data_factory can simluate
+    // This inner class is so that node_all_val_data_factory can simulate
     // a template template parameter
     template <typename IteratorT>
     class factory
@@ -480,8 +502,6 @@ public:
             for (typename ContainerT::const_iterator i = nodes.begin();
                     i != i_end; ++i)
             {
-                // See docs: token_node_d or leaf_node_d cannot be used with a
-                // rule inside the [].
                 assert(i->children.size() == 0);
                 c.insert(c.end(), i->value.begin(), i->value.end());
             }
@@ -489,14 +509,6 @@ public:
         }
     };
 };
-
-//  forward declaration
-template <
-    typename IteratorT,
-    typename NodeFactoryT = node_val_data_factory<nil_t>,
-    typename T = nil_t
->
-class tree_match;
 
 namespace impl {
 
@@ -548,14 +560,15 @@ public:
     tree_match(std::size_t length, parse_node_t const& n)
     : match<T>(length), trees()
     { 
-        trees.reserve(10); // this is more or less an arbitraty number...
         trees.push_back(node_t(n)); 
     }
 
     tree_match(std::size_t length, param_type val, parse_node_t const& n)
     : match<T>(length, val), trees()
     {
-        trees.reserve(10); // this is more or less an arbitraty number...
+#if !defined(BOOST_SPIRIT_USE_LIST_FOR_TREES)
+        trees.reserve(10); // this is more or less an arbitrary number...
+#endif
         trees.push_back(node_t(n));
     }
 
@@ -665,14 +678,25 @@ template <
     typename MatchPolicyT,
     typename IteratorT,
     typename NodeFactoryT,
-    typename TreePolicyT
+    typename TreePolicyT, 
+    typename T
 >
 struct common_tree_match_policy : public match_policy
 {
-    template <typename T>
-    struct result { typedef tree_match<IteratorT, NodeFactoryT, T> type; };
+    common_tree_match_policy()
+    {
+    }
 
-    typedef tree_match<IteratorT, NodeFactoryT> match_t;
+    template <typename PolicyT>
+    common_tree_match_policy(PolicyT const & policies)
+        : match_policy((match_policy const &)policies)
+    {
+    }
+
+    template <typename U>
+    struct result { typedef tree_match<IteratorT, NodeFactoryT, U> type; };
+
+    typedef tree_match<IteratorT, NodeFactoryT, T> match_t;
     typedef IteratorT iterator_t;
     typedef TreePolicyT tree_policy_t;
     typedef NodeFactoryT factory_t;
@@ -803,7 +827,6 @@ struct no_tree_gen_node_parser
     typedef no_tree_gen_node_parser<T> self_t;
     typedef no_tree_gen_node_parser_gen parser_generator_t;
     typedef unary_parser_category parser_category_t;
-//    typedef no_tree_gen_node_parser<T> const &embed_t;
 
     no_tree_gen_node_parser(T const& a)
     : unary<T, parser<no_tree_gen_node_parser<T> > >(a) {}
@@ -825,7 +848,6 @@ struct no_tree_gen_node_parser
     }
 };
 
-//////////////////////////////////
 struct no_tree_gen_node_parser_gen
 {
     template <typename T>
@@ -849,9 +871,72 @@ struct no_tree_gen_node_parser_gen
     }
 };
 
-//////////////////////////////////
 const no_tree_gen_node_parser_gen no_node_d = no_tree_gen_node_parser_gen();
 
+//////////////////////////////////
+
+struct leaf_node_parser_gen;
+
+template<typename T>
+struct leaf_node_parser
+:   public unary<T, parser<leaf_node_parser<T> > >
+{
+    typedef leaf_node_parser<T> self_t;
+    typedef leaf_node_parser_gen parser_generator_t;
+    typedef unary_parser_category parser_category_t;
+
+    leaf_node_parser(T const& a)
+    : unary<T, parser<leaf_node_parser<T> > >(a) {}
+
+    template <typename ScannerT>
+    typename parser_result<self_t, ScannerT>::type
+    parse(ScannerT const& scanner) const
+    {
+        typedef scanner_policies< typename ScannerT::iteration_policy_t,
+            match_policy, typename ScannerT::action_policy_t > policies_t;
+
+        typedef typename ScannerT::iterator_t iterator_t;
+        typedef typename parser_result<self_t, ScannerT>::type result_t;
+        typedef typename result_t::node_factory_t factory_t;
+
+        iterator_t from = scanner.first;
+        result_t hit = impl::contiguous_parser_parse<result_t>(this->subject(),
+            scanner.change_policies(policies_t(scanner,match_policy(),scanner)),
+            scanner);
+
+        if (hit)
+            return result_t(hit.length(), 
+                factory_t::create_node(from, scanner.first, true));
+        else
+            return result_t(hit.length());
+    }
+};
+
+struct leaf_node_parser_gen
+{
+    template <typename T>
+    struct result {
+
+        typedef leaf_node_parser<T> type;
+    };
+
+    template <typename T>
+    static leaf_node_parser<T>
+    generate(parser<T> const& s)
+    {
+        return leaf_node_parser<T>(s.derived());
+    }
+
+    template <typename T>
+    leaf_node_parser<T>
+    operator[](parser<T> const& s) const
+    {
+        return leaf_node_parser<T>(s.derived());
+    }
+};
+
+const leaf_node_parser_gen leaf_node_d = leaf_node_parser_gen();
+const leaf_node_parser_gen token_node_d = leaf_node_parser_gen();
 
 //////////////////////////////////
 namespace impl {
@@ -875,10 +960,15 @@ struct node_parser
     typedef node_parser<T, NodeParserT> self_t;
     typedef node_parser_gen<NodeParserT> parser_generator_t;
     typedef unary_parser_category parser_category_t;
-//    typedef node_parser<T, NodeParserT> const &embed_t;
 
     node_parser(T const& a)
     : unary<T, parser<node_parser<T, NodeParserT> > >(a) {}
+
+    template <typename ScannerT>
+    struct result
+    {
+        typedef typename parser_result<T, ScannerT>::type type;
+    };
 
     template <typename ScannerT>
     typename parser_result<self_t, ScannerT>::type
@@ -893,7 +983,6 @@ struct node_parser
     }
 };
 
-//////////////////////////////////
 template <typename NodeParserT>
 struct node_parser_gen
 {
@@ -917,20 +1006,8 @@ struct node_parser_gen
         return node_parser<T, NodeParserT>(s.derived());
     }
 };
-
-struct discard_node_op
-{
-    template <typename MatchT>
-    void operator()(MatchT& m) const
-    {
-        m.trees.clear();
-    }
-};
-
-const node_parser_gen<discard_node_op> discard_node_d =
-    node_parser_gen<discard_node_op>();
-
-struct leaf_node_op
+//////////////////////////////////
+struct reduced_node_op
 {
     template <typename MatchT>
     void operator()(MatchT& m) const
@@ -947,10 +1024,21 @@ struct leaf_node_op
     }
 };
 
-const node_parser_gen<leaf_node_op> leaf_node_d =
-    node_parser_gen<leaf_node_op>();
-const node_parser_gen<leaf_node_op> token_node_d =
-    node_parser_gen<leaf_node_op>();
+const node_parser_gen<reduced_node_op> reduced_node_d =
+    node_parser_gen<reduced_node_op>();
+
+
+struct discard_node_op
+{
+    template <typename MatchT>
+    void operator()(MatchT& m) const
+    {
+        m.trees.clear();
+    }
+};
+
+const node_parser_gen<discard_node_op> discard_node_d =
+    node_parser_gen<discard_node_op>();
 
 struct infix_node_op
 {
@@ -976,7 +1064,9 @@ struct infix_node_op
         BOOST_SPIRIT_ASSERT(tree_size >= 1);
 
         bool keep = true;
+#if !defined(BOOST_SPIRIT_USE_LIST_FOR_TREES)
         new_children.reserve((tree_size+1)/2);
+#endif
         iter_t i_end = m.trees.end();
         for (iter_t i = m.trees.begin(); i != i_end; ++i)
         {
@@ -1018,8 +1108,9 @@ struct discard_first_node_op
         // copying the tree nodes is expensive, since it may copy a whole
         // tree.  swapping them is cheap, so swap the nodes we want into
         // a new container of children, instead of saying
-        // m.trees.erase(m.trees.begin()) because, on a vector that will cause
-        // all the nodes afterwards to be copied into the previous position.
+        // m.trees.erase(m.trees.begin()) because, on a container_t that will 
+        // cause all the nodes afterwards to be copied into the previous 
+        // position.
         container_t new_children;
         std::size_t length = 0;
         std::size_t tree_size = m.trees.size();
@@ -1028,7 +1119,9 @@ struct discard_first_node_op
         BOOST_SPIRIT_ASSERT(tree_size >= 1);
 
         if (tree_size > 1) {
+#if !defined(BOOST_SPIRIT_USE_LIST_FOR_TREES)
             new_children.reserve(tree_size - 1);
+#endif
             iter_t i = m.trees.begin(), i_end = m.trees.end();
             for (++i; i != i_end; ++i)
             {
@@ -1079,8 +1172,9 @@ struct discard_last_node_op
         // copying the tree nodes is expensive, since it may copy a whole
         // tree.  swapping them is cheap, so swap the nodes we want into
         // a new container of children, instead of saying
-        // m.trees.erase(m.trees.begin()) because, on a vector that will cause
-        // all the nodes afterwards to be copied into the previous position.
+        // m.trees.erase(m.trees.begin()) because, on a container_t that will 
+        // cause all the nodes afterwards to be copied into the previous 
+        // position.
         container_t new_children;
         std::size_t length = 0;
         std::size_t tree_size = m.trees.size();
@@ -1090,8 +1184,9 @@ struct discard_last_node_op
 
         if (tree_size > 1) {
             m.trees.pop_back();
+#if !defined(BOOST_SPIRIT_USE_LIST_FOR_TREES)
             new_children.reserve(tree_size - 1);
-            
+#endif            
             iter_t i_end = m.trees.end();
             for (iter_t i = m.trees.begin(); i != i_end; ++i)
             {
@@ -1137,8 +1232,9 @@ struct inner_node_op
         // copying the tree nodes is expensive, since it may copy a whole
         // tree.  swapping them is cheap, so swap the nodes we want into
         // a new container of children, instead of saying
-        // m.trees.erase(m.trees.begin()) because, on a vector that will cause
-        // all the nodes afterwards to be copied into the previous position.
+        // m.trees.erase(m.trees.begin()) because, on a container_t that will 
+        // cause all the nodes afterwards to be copied into the previous 
+        // position.
         container_t new_children;
         std::size_t length = 0;
         std::size_t tree_size = m.trees.size();
@@ -1148,7 +1244,9 @@ struct inner_node_op
 
         if (tree_size > 2) {
             m.trees.pop_back(); // erase the last element
+#if !defined(BOOST_SPIRIT_USE_LIST_FOR_TREES)
             new_children.reserve(tree_size - 1);
+#endif
             iter_t i = m.trees.begin(); // skip over the first element
             iter_t i_end = m.trees.end();
             for (++i; i != i_end; ++i)
@@ -1197,10 +1295,15 @@ struct action_directive_parser
     typedef action_directive_parser<T, ActionParserT> self_t;
     typedef action_directive_parser_gen<ActionParserT> parser_generator_t;
     typedef unary_parser_category parser_category_t;
-//    typedef action_directive_parser<T, ActionParserT> const &embed_t;
 
     action_directive_parser(T const& a)
         : unary<T, parser<action_directive_parser<T, ActionParserT> > >(a) {}
+
+    template <typename ScannerT>
+    struct result
+    {
+        typedef typename parser_result<T, ScannerT>::type type;
+    };
 
     template <typename ScannerT>
     typename parser_result<self_t, ScannerT>::type
@@ -1247,29 +1350,33 @@ struct action_directive_parser_gen
 
 //////////////////////////////////
 // Calls the attached action passing it the match from the parser
-// and the first and last iterators
-struct access_match_action
+// and the first and last iterators.
+// The inner template class is used to simulate template-template parameters
+// (declared in common_fwd.hpp).
+template <typename ParserT, typename ActionT>
+struct access_match_action::action
+:   public unary<ParserT, parser<access_match_action::action<ParserT, ActionT> > >
 {
-    // inner template class to simulate template-template parameters
-    template <typename ParserT, typename ActionT>
-    struct action
-    :   public unary<ParserT, parser<access_match_action::action<ParserT, ActionT> > >
+    typedef action_parser_category parser_category;
+    typedef action<ParserT, ActionT> self_t;
+    
+    template <typename ScannerT>
+    struct result
     {
-        typedef action_parser_category parser_category;
-        typedef action<ParserT, ActionT> self_t;
-
-        action( ParserT const& subject,
-                ActionT const& actor_);
-
-        template <typename ScannerT>
-        typename parser_result<self_t, ScannerT>::type
-        parse(ScannerT const& scanner) const;
-
-        ActionT const &predicate() const;
-
-        private:
-        ActionT actor;
+        typedef typename parser_result<ParserT, ScannerT>::type type;
     };
+
+    action( ParserT const& subject,
+            ActionT const& actor_);
+
+    template <typename ScannerT>
+    typename parser_result<self_t, ScannerT>::type
+    parse(ScannerT const& scanner) const;
+
+    ActionT const &predicate() const;
+
+    private:
+    ActionT actor;
 };
 
 //////////////////////////////////
@@ -1316,28 +1423,32 @@ const action_directive_parser_gen<access_match_action> access_match_d
 //////////////////////////////////
 // Calls the attached action passing it the node from the parser
 // and the first and last iterators
-struct access_node_action
+// The inner template class is used to simulate template-template parameters
+// (declared in common_fwd.hpp).
+template <typename ParserT, typename ActionT>
+struct access_node_action::action
+:   public unary<ParserT, parser<access_node_action::action<ParserT, ActionT> > >
 {
-    // inner template class to simulate template-template parameters
-    template <typename ParserT, typename ActionT>
-    struct action
-    :   public unary<ParserT, parser<access_node_action::action<ParserT, ActionT> > >
+    typedef action_parser_category parser_category;
+    typedef action<ParserT, ActionT> self_t;
+    
+    template <typename ScannerT>
+    struct result
     {
-        typedef action_parser_category parser_category;
-        typedef action<ParserT, ActionT> self_t;
-
-        action( ParserT const& subject,
-                ActionT const& actor_);
-
-        template <typename ScannerT>
-        typename parser_result<self_t, ScannerT>::type
-        parse(ScannerT const& scanner) const;
-
-        ActionT const &predicate() const;
-
-        private:
-        ActionT actor;
+        typedef typename parser_result<ParserT, ScannerT>::type type;
     };
+
+    action( ParserT const& subject,
+            ActionT const& actor_);
+
+    template <typename ScannerT>
+    typename parser_result<self_t, ScannerT>::type
+    parse(ScannerT const& scanner) const;
+
+    ActionT const &predicate() const;
+
+    private:
+    ActionT actor;
 };
 
 //////////////////////////////////
@@ -1409,12 +1520,12 @@ const action_directive_parser_gen<access_node_action> access_node_d
 //
 ///////////////////////////////////////////////////////////////////////////////
 template <
-    typename IteratorT = char const *,
-    typename NodeFactoryT = node_val_data_factory<nil_t>,
-    typename T = nil_t
+    typename IteratorT,
+    typename NodeFactoryT,
+    typename T
 >
-struct tree_parse_info {
-
+struct tree_parse_info 
+{
     IteratorT   stop;
     bool        match;
     bool        full;

@@ -22,8 +22,19 @@
 
 #include <new>
 
+#ifdef BOOST_MSVC
+#pragma warning(push)
+#pragma warning(disable: 4103)
+#endif
 #ifdef BOOST_HAS_ABI_HEADERS
 #  include BOOST_ABI_PREFIX
+#endif
+#ifdef BOOST_MSVC
+#pragma warning(pop)
+#endif
+#ifdef BOOST_MSVC
+#  pragma warning(push)
+#  pragma warning(disable: 4800)
 #endif
 
 namespace boost{
@@ -1066,6 +1077,8 @@ bool perl_matcher<BidiIterator, Allocator, traits>::unwind_slow_dot_repeat(bool 
    {
       // can't repeat any more, remove the pushed state: 
       destroy_single_repeat();
+      if((m_match_flags & match_partial) && (position == last) && (position != search_base))
+         m_has_partial_match = true;
       if(0 == (rep->can_be_null & mask_skip))
          return true;
    }
@@ -1118,6 +1131,8 @@ bool perl_matcher<BidiIterator, Allocator, traits>::unwind_fast_dot_repeat(bool 
    {
       // can't repeat any more, remove the pushed state: 
       destroy_single_repeat();
+      if((m_match_flags & match_partial) && (position == last) && (position != search_base))
+         m_has_partial_match = true;
       if(0 == (rep->can_be_null & mask_skip))
          return true;
    }
@@ -1182,6 +1197,8 @@ bool perl_matcher<BidiIterator, Allocator, traits>::unwind_char_repeat(bool r)
    {
       // can't repeat any more, remove the pushed state: 
       destroy_single_repeat();
+      if((m_match_flags & match_partial) && (position == last) && (position != search_base))
+         m_has_partial_match = true;
       if(0 == (rep->can_be_null & mask_skip))
          return true;
    }
@@ -1246,6 +1263,8 @@ bool perl_matcher<BidiIterator, Allocator, traits>::unwind_short_set_repeat(bool
    {
       // can't repeat any more, remove the pushed state: 
       destroy_single_repeat();
+      if((m_match_flags & match_partial) && (position == last) && (position != search_base))
+         m_has_partial_match = true;
       if(0 == (rep->can_be_null & mask_skip))
          return true;
    }
@@ -1311,6 +1330,8 @@ bool perl_matcher<BidiIterator, Allocator, traits>::unwind_long_set_repeat(bool 
    {
       // can't repeat any more, remove the pushed state:
       destroy_single_repeat();
+      if((m_match_flags & match_partial) && (position == last) && (position != search_base))
+         m_has_partial_match = true;
       if(0 == (rep->can_be_null & mask_skip))
          return true;
    }
@@ -1348,8 +1369,19 @@ bool perl_matcher<BidiIterator, Allocator, traits>::unwind_non_greedy_repeat(boo
 } // namespace re_detail
 } // namespace boost
 
+#ifdef BOOST_MSVC
+#  pragma warning(pop)
+#endif
+
+#ifdef BOOST_MSVC
+#pragma warning(push)
+#pragma warning(disable: 4103)
+#endif
 #ifdef BOOST_HAS_ABI_HEADERS
 #  include BOOST_ABI_SUFFIX
+#endif
+#ifdef BOOST_MSVC
+#pragma warning(pop)
 #endif
 
 #endif

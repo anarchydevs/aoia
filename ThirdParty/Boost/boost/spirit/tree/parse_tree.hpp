@@ -1,5 +1,6 @@
 /*=============================================================================
     Copyright (c) 2001-2003 Daniel Nuffer
+    Copyright (c) 2001-2007 Hartmut Kaiser
     http://spirit.sourceforge.net/
 
     Use, modification and distribution is subject to the Boost Software
@@ -12,42 +13,67 @@
 #include <boost/spirit/tree/common.hpp>
 #include <boost/spirit/core/scanner/scanner.hpp>
 
+#include <boost/spirit/tree/parse_tree_fwd.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace boost { namespace spirit {
 
-template <typename MatchPolicyT, typename NodeFactoryT>
-struct pt_tree_policy;
 
 //////////////////////////////////
 // pt_match_policy is simply an id so the correct specialization of tree_policy can be found.
 template <
     typename IteratorT,
-    typename NodeFactoryT = node_val_data_factory<nil_t>
+    typename NodeFactoryT,
+    typename T 
 >
 struct pt_match_policy :
     public common_tree_match_policy<
-        pt_match_policy<IteratorT, NodeFactoryT>,
+        pt_match_policy<IteratorT, NodeFactoryT, T>,
         IteratorT,
         NodeFactoryT,
         pt_tree_policy<
-            pt_match_policy<IteratorT, NodeFactoryT>,
-            NodeFactoryT
-        >
+            pt_match_policy<IteratorT, NodeFactoryT, T>,
+            NodeFactoryT,
+            T
+        >,
+        T
     >
 {
+    typedef
+        common_tree_match_policy<
+            pt_match_policy<IteratorT, NodeFactoryT, T>,
+            IteratorT,
+            NodeFactoryT,
+            pt_tree_policy<
+                pt_match_policy<IteratorT, NodeFactoryT, T>,
+                NodeFactoryT,
+                T
+            >,
+            T
+        >
+    common_tree_match_policy_;
+
+    pt_match_policy()
+    {
+    }
+
+    template <typename PolicyT>
+    pt_match_policy(PolicyT const & policies)
+        : common_tree_match_policy_(policies)
+    {
+    }
 };
 
 //////////////////////////////////
-template <typename MatchPolicyT, typename NodeFactoryT>
+template <typename MatchPolicyT, typename NodeFactoryT, typename T>
 struct pt_tree_policy :
     public common_tree_tree_policy<MatchPolicyT, NodeFactoryT>
 {
-    typedef
-        typename common_tree_tree_policy<MatchPolicyT, NodeFactoryT>::match_t
-        match_t;
+    typedef typename MatchPolicyT::match_t match_t;
     typedef typename MatchPolicyT::iterator_t iterator_t;
 
-    static void concat(match_t& a, match_t const& b)
+    template<typename MatchAT, typename MatchBT>
+    static void concat(MatchAT& a, MatchBT const& b)
     {
         typedef typename match_t::attr_t attr_t;
         BOOST_SPIRIT_ASSERT(a && b);
@@ -64,7 +90,7 @@ struct pt_tree_policy :
             return;
 
         typedef typename NodeFactoryT::template factory<iterator_t> factory_t;
-        typedef typename tree_match<iterator_t, NodeFactoryT>::container_t
+        typedef typename tree_match<iterator_t, NodeFactoryT, T>::container_t
             container_t;
         typedef typename container_t::iterator cont_iterator_t;
 
@@ -84,8 +110,8 @@ struct pt_tree_policy :
         m = newmatch;
     }
 
-    template <typename FunctorT>
-    static void apply_op_to_match(FunctorT const& op, match_t& m)
+    template <typename FunctorT, typename MatchT>
+    static void apply_op_to_match(FunctorT const& op, MatchT& m)
     {
         op(m);
     }
@@ -93,11 +119,14 @@ struct pt_tree_policy :
 
 namespace impl {
 
-    template <typename IteratorT, typename NodeFactoryT>
-    struct tree_policy_selector<pt_match_policy<IteratorT, NodeFactoryT> >
+    template <typename IteratorT, typename NodeFactoryT, typename T>
+    struct tree_policy_selector<pt_match_policy<IteratorT, NodeFactoryT, T> >
     {
         typedef pt_tree_policy<
-            pt_match_policy<IteratorT, NodeFactoryT>, NodeFactoryT> type;
+            pt_match_policy<IteratorT, NodeFactoryT, T>, 
+            NodeFactoryT, 
+            T
+        > type;
     };
 
 } // namespace impl
@@ -113,7 +142,6 @@ struct gen_pt_node_parser
     typedef gen_pt_node_parser<T> self_t;
     typedef gen_pt_node_parser_gen parser_generator_t;
     typedef unary_parser_category parser_category_t;
-//    typedef gen_pt_node_parser<T> const &embed_t;
 
     gen_pt_node_parser(T const& a)
     : unary<T, parser<gen_pt_node_parser<T> > >(a) {}
@@ -194,7 +222,6 @@ pt_parse(
     IteratorT first = first_;
     scanner_t scan(first, last, policies);
     tree_match<IteratorT, NodeFactoryT> hit = p.derived().parse(scan);
-    scan.skip(scan);
     return tree_parse_info<IteratorT, NodeFactoryT>(
         first, hit, hit && (first == last), hit.length(), hit.trees);
 }

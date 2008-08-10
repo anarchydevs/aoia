@@ -51,12 +51,12 @@
 #include <boost/static_assert.hpp>
 #include <boost/type_traits/detail/yes_no_type.hpp>
 #include <boost/type_traits/is_class.hpp>
-#include "boost/type_traits/detail/ice_and.hpp"
+#include <boost/type_traits/detail/ice_and.hpp>
 #ifdef BOOST_NO_IS_ABSTRACT
 #include <boost/type_traits/is_polymorphic.hpp>
 #endif
 // should be the last #include
-#include "boost/type_traits/detail/bool_trait_def.hpp"
+#include <boost/type_traits/detail/bool_trait_def.hpp>
 
 
 namespace boost {
@@ -85,7 +85,14 @@ struct is_abstract_imp2
 #ifdef __GNUC__
    BOOST_STATIC_CONSTANT(unsigned, s1 = sizeof(is_abstract_imp2<T>::template check_sig<T>(0)));
 #else
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400)
+#pragma warning(push)
+#pragma warning(disable:6334)
+#endif
    BOOST_STATIC_CONSTANT(unsigned, s1 = sizeof(check_sig<T>(0)));
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400)
+#pragma warning(pop)
+#endif
 #endif
     
    BOOST_STATIC_CONSTANT(bool, value = 
@@ -132,6 +139,6 @@ BOOST_TT_AUX_BOOL_TRAIT_DEF1(is_abstract,T,::boost::detail::is_polymorphic_imp<T
 
 } // namespace boost
 
-#include "boost/type_traits/detail/bool_trait_undef.hpp"
+#include <boost/type_traits/detail/bool_trait_undef.hpp>
 
 #endif //BOOST_TT_IS_ABSTRACT_CLASS_HPP

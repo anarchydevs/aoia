@@ -1,11 +1,12 @@
 //  Boost string_algo library string_funct.hpp header file  ---------------------------//
 
-//  Copyright Pavol Droba 2002-2003. Use, modification and
-//  distribution is subject to the Boost Software License, Version
-//  1.0. (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)
+//  Copyright Pavol Droba 2002-2003.
+//
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE_1_0.txt or copy at
+//          http://www.boost.org/LICENSE_1_0.txt)
 
-//  See http://www.boost.org for updates, documentation, and revision history.
+//  See http://www.boost.org/ for updates, documentation, and revision history.
 
 #ifndef BOOST_STRING_CASE_CONV_DETAIL_HPP
 #define BOOST_STRING_CASE_CONV_DETAIL_HPP
@@ -33,7 +34,7 @@ namespace boost {
                     #if defined(__BORLANDC__) && (__BORLANDC__ >= 0x560) && (__BORLANDC__ <= 0x564) && !defined(_USE_OLD_RW_STL)
                         return std::tolower( Ch);
                     #else
-                        return std::tolower( Ch, m_Loc );
+                        return std::tolower<CharT>( Ch, m_Loc );
                     #endif
                 }
             private:
@@ -53,12 +54,55 @@ namespace boost {
                     #if defined(__BORLANDC__) && (__BORLANDC__ >= 0x560) && (__BORLANDC__ <= 0x564) && !defined(_USE_OLD_RW_STL)
                         return std::toupper( Ch);
                     #else
-                        return std::toupper( Ch, m_Loc );
+                        return std::toupper<CharT>( Ch, m_Loc );
                     #endif
                 }
             private:
                 const std::locale& m_Loc;
             };
+
+// algorithm implementation -------------------------------------------------------------------------
+
+            // Transform a range
+            template<typename OutputIteratorT, typename RangeT, typename FunctorT>
+            OutputIteratorT transform_range_copy(
+                OutputIteratorT Output,
+                const RangeT& Input,
+                FunctorT Functor)
+            {
+                return std::transform( 
+                    begin(Input), 
+                    end(Input), 
+                    Output,
+                    Functor);
+            }
+
+            // Transform a range (in-place)
+            template<typename RangeT, typename FunctorT>
+            void transform_range(
+                const RangeT& Input,
+                FunctorT Functor)
+            {
+                std::transform( 
+                    begin(Input), 
+                    end(Input), 
+                    begin(Input),
+                    Functor);
+            }
+
+            template<typename SequenceT, typename RangeT, typename FunctorT>
+            inline SequenceT transform_range_copy( 
+                const RangeT& Input, 
+                FunctorT Functor)
+            {
+                return SequenceT(
+                    make_transform_iterator(
+                        begin(Input),
+                        Functor),
+                    make_transform_iterator(
+                        end(Input), 
+                        Functor));
+            }
 
         } // namespace detail
     } // namespace algorithm

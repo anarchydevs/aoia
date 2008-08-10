@@ -23,6 +23,8 @@
 #include <boost/spirit/iterator/fixed_size_queue.hpp>
 #include <boost/detail/iterator.hpp> // for boost::detail::iterator_traits
 
+#include <boost/spirit/iterator/multi_pass_fwd.hpp>
+
 namespace boost { namespace spirit {
 
 namespace impl {
@@ -486,17 +488,22 @@ class input_iterator
 template <typename InputT>
 class inner
 {
+    private:
         typedef
             typename boost::detail::iterator_traits<InputT>::value_type
             result_type;
 
+    public:
+        typedef result_type value_type;
+
+    private:
         struct Data {
             Data(InputT const &input_) 
             :   input(input_), was_initialized(false)
             {}
             
             InputT input;
-            result_type curtok;
+            value_type curtok;
             bool was_initialized;
         };
 
@@ -507,7 +514,6 @@ class inner
        friend struct Data;
 
     public:
-        typedef result_type value_type;
         typedef
             typename boost::detail::iterator_traits<InputT>::difference_type
             difference_type;
@@ -774,26 +780,11 @@ struct iterator_base_creator
 
 }}
 
-
-
 ///////////////////////////////////////////////////////////////////////////////
-// class template multi_pass (declaration)
+// class template multi_pass 
 ///////////////////////////////////////////////////////////////////////////////
-template
-<
-    typename InputT,
-    typename InputPolicy = multi_pass_policies::input_iterator,
-    typename OwnershipPolicy = multi_pass_policies::ref_counted,
-    typename CheckingPolicy = multi_pass_policies::buf_id_check,
-    typename StoragePolicy = multi_pass_policies::std_deque
->
-class multi_pass;
 
 // The default multi_pass instantiation uses a ref-counted std_deque scheme.
-
-///////////////////////////////////////////////////////////////////////////////
-// class template multi_pass (definition)
-///////////////////////////////////////////////////////////////////////////////
 template
 <
     typename InputT,

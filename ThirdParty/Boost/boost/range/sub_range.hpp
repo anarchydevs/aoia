@@ -11,10 +11,15 @@
 #ifndef BOOST_RANGE_SUB_RANGE_HPP
 #define BOOST_RANGE_SUB_RANGE_HPP
 
+#include <boost/detail/workaround.hpp>
+
+#if BOOST_WORKAROUND(BOOST_MSVC, == 1310) || BOOST_WORKAROUND(BOOST_MSVC, == 1400) 
+    #pragma warning( disable : 4996 )
+#endif
+
 #include <boost/range/config.hpp>
 #include <boost/range/iterator_range.hpp>
 #include <boost/range/value_type.hpp>
-#include <boost/range/result_iterator.hpp>
 #include <boost/range/size_type.hpp>
 #include <boost/range/difference_type.hpp>
 #include <boost/assert.hpp>
@@ -23,37 +28,30 @@ namespace boost
 {
     
     template< class ForwardRange > 
-    class sub_range : public iterator_range< BOOST_DEDUCED_TYPENAME range_result_iterator<ForwardRange>::type > 
+    class sub_range : public iterator_range< BOOST_DEDUCED_TYPENAME range_iterator<ForwardRange>::type > 
     {
-        typedef BOOST_DEDUCED_TYPENAME range_result_iterator<ForwardRange>::type iterator_t;
+        typedef BOOST_DEDUCED_TYPENAME range_iterator<ForwardRange>::type iterator_t;
         typedef iterator_range< iterator_t  > base;
 
         typedef BOOST_DEDUCED_TYPENAME base::impl impl;
     public:
         typedef BOOST_DEDUCED_TYPENAME range_value<ForwardRange>::type            value_type;
-        typedef BOOST_DEDUCED_TYPENAME range_result_iterator<ForwardRange>::type  iterator;
-        typedef BOOST_DEDUCED_TYPENAME range_const_iterator<ForwardRange>::type   const_iterator;
+        typedef BOOST_DEDUCED_TYPENAME range_iterator<ForwardRange>::type         iterator;
+        typedef BOOST_DEDUCED_TYPENAME range_iterator<const ForwardRange>::type   const_iterator;
         typedef BOOST_DEDUCED_TYPENAME range_difference<ForwardRange>::type       difference_type;
         typedef BOOST_DEDUCED_TYPENAME range_size<ForwardRange>::type             size_type;
+        typedef BOOST_DEDUCED_TYPENAME base::reference                            reference;
 
     public:
         sub_range() : base() 
         { }
-/*
-#if BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x564))  
-        typedef sub_range<ForwardRange> this_type;
         
-        sub_range( this_type r ) :
-        : base( r )
-        { }
-
-        this_type& operator=( this_type r )
-        {
-            base::operator=( r );
-            return *this;
-        }
+#if BOOST_WORKAROUND(BOOST_MSVC, == 1310) || BOOST_WORKAROUND(BOOST_MSVC, == 1400) 
+        sub_range( const sub_range& r ) 
+            : base( static_cast<const base&>( r ) )  
+        { }  
 #endif
-*/
+
         template< class ForwardRange2 >
         sub_range( ForwardRange2& r ) : 
             
@@ -91,6 +89,12 @@ namespace boost
         {
             base::operator=( r );
             return *this;
+        }   
+
+        sub_range& operator=( const sub_range& r )
+        {
+            base::operator=( static_cast<const base&>(r) );
+            return *this;            
         }
         
     public:
@@ -99,11 +103,11 @@ namespace boost
         const_iterator  begin() const    { return base::begin(); }
         iterator        end()            { return base::end();   }
         const_iterator  end() const      { return base::end();   }
-        size_type       size() const     { return base::size();  }   
+        difference_type size() const     { return base::size();  }   
 
         
     public: // convenience
-        value_type& front()
+        reference front()
         {
             return base::front();
         }
@@ -113,7 +117,7 @@ namespace boost
             return base::front();
         }
 
-        value_type& back()
+        reference back()
         {
             return base::back();
         }
@@ -123,12 +127,12 @@ namespace boost
             return base::back();
         }
 
-        value_type& operator[]( size_type sz )
+        reference operator[]( difference_type sz )
         {
             return base::operator[](sz);
         }
 
-        const value_type& operator[]( size_type sz ) const
+        const value_type& operator[]( difference_type sz ) const
         {
             return base::operator[](sz);
         }
@@ -160,3 +164,4 @@ namespace boost
 } // namespace 'boost'
 
 #endif
+
