@@ -5,7 +5,7 @@
     
     http://www.boost.org/
 
-    Copyright (c) 2001-2005 Hartmut Kaiser. Distributed under the Boost
+    Copyright (c) 2001-2008 Hartmut Kaiser. Distributed under the Boost
     Software License, Version 1.0. (See accompanying file
     LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
@@ -18,6 +18,12 @@
 #include <boost/iterator_adaptors.hpp>
 
 #include <boost/wave/wave_config.hpp>
+#include <boost/wave/token_ids.hpp>     // token_id 
+
+// this must occur after all of the includes and before any code appears
+#ifdef BOOST_HAS_ABI_HEADERS
+#include BOOST_ABI_PREFIX
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace boost {
@@ -411,10 +417,7 @@ namespace impl {
     inline boost::wave::token_id 
     skip_whitespace(IteratorT &first, IteratorT const &last)
     {
-        using namespace cpplexer;
-        
-    token_id id = next_token<IteratorT>::peek(first, last, false);
-
+        token_id id = next_token<IteratorT>::peek(first, last, false);
         if (IS_CATEGORY(id, WhiteSpaceTokenType)) {
             do {
                 ++first;
@@ -429,11 +432,9 @@ namespace impl {
     inline boost::wave::token_id 
     skip_whitespace(IteratorT &first, IteratorT const &last, ContainerT &queue)
     {
-        using namespace cpplexer;
         queue.push_back (*first);       // queue up the current token
         
-    token_id id = next_token<IteratorT>::peek(first, last, false);
-
+        token_id id = next_token<IteratorT>::peek(first, last, false);
         if (IS_CATEGORY(id, WhiteSpaceTokenType)) {
             do {
                 queue.push_back(*++first);  // queue up the next whitespace 
@@ -451,5 +452,10 @@ namespace impl {
 }   // namespace util
 }   // namespace wave
 }   // namespace boost
+
+// the suffix header occurs after all of the code
+#ifdef BOOST_HAS_ABI_HEADERS
+#include BOOST_ABI_SUFFIX
+#endif
 
 #endif // !defined(UNPUT_QUEUE_ITERATOR_HPP_76DA23D0_4893_4AD5_ABCC_6CED7CFB89BC_INCLUDED)

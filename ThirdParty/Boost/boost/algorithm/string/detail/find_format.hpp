@@ -1,11 +1,12 @@
 //  Boost string_algo library find_format.hpp header file  ---------------------------//
 
-//  Copyright Pavol Droba 2002-2003. Use, modification and
-//  distribution is subject to the Boost Software License, Version
-//  1.0. (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)
+//  Copyright Pavol Droba 2002-2003.
+// 
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE_1_0.txt or copy at
+//          http://www.boost.org/LICENSE_1_0.txt)
 
-//  See http://www.boost.org for updates, documentation, and revision history.
+//  See http://www.boost.org/ for updates, documentation, and revision history.
 
 #ifndef BOOST_STRING_FIND_FORMAT_DETAIL_HPP
 #define BOOST_STRING_FIND_FORMAT_DETAIL_HPP
@@ -26,20 +27,17 @@ namespace boost {
             template< 
                 typename OutputIteratorT,
                 typename InputT,
-                typename FinderT,
                 typename FormatterT,
                 typename FindResultT >
             inline OutputIteratorT find_format_copy_impl(
                 OutputIteratorT Output,
                 const InputT& Input,
-                FinderT Finder,
                 FormatterT Formatter,
                 const FindResultT& FindResult )
             {       
                 return find_format_copy_impl2( 
                     Output,
                     Input,
-                    Finder,
                     Formatter,
                     FindResult,
                     Formatter(FindResult) );
@@ -48,14 +46,12 @@ namespace boost {
             template< 
                 typename OutputIteratorT,
                 typename InputT,
-                typename FinderT,
                 typename FormatterT,
                 typename FindResultT,
                 typename FormatResultT >
             inline OutputIteratorT find_format_copy_impl2(
                 OutputIteratorT Output,
                 const InputT& Input,
-                FinderT Finder,
                 FormatterT Formatter,
                 const FindResultT& FindResult,
                 const FormatResultT& FormatResult )
@@ -91,18 +87,15 @@ namespace boost {
 
             template< 
                 typename InputT, 
-                typename FinderT,
                 typename FormatterT,
                 typename FindResultT >
             inline InputT find_format_copy_impl(
                 const InputT& Input,
-                FinderT Finder,
                 FormatterT Formatter,
                 const FindResultT& FindResult)
             {
                 return find_format_copy_impl2(
                     Input,
-                    Finder,
                     Formatter,
                     FindResult,
                     Formatter(FindResult) );
@@ -110,13 +103,11 @@ namespace boost {
 
             template< 
                 typename InputT, 
-                typename FinderT,
                 typename FormatterT,
                 typename FindResultT,
                 typename FormatResultT >
             inline InputT find_format_copy_impl2(
                 const InputT& Input,
-                FinderT Finder,
                 FormatterT Formatter,
                 const FindResultT& FindResult,
                 const FormatResultT& FormatResult)
@@ -151,18 +142,15 @@ namespace boost {
         
             template<
                 typename InputT,
-                typename FinderT,
                 typename FormatterT,
                 typename FindResultT >
             inline void find_format_impl( 
                 InputT& Input,
-                FinderT Finder,
                 FormatterT Formatter,
                 const FindResultT& FindResult)
             {
                 find_format_impl2(
                     Input,
-                    Finder,
                     Formatter,
                     FindResult,
                     Formatter(FindResult) );
@@ -170,13 +158,11 @@ namespace boost {
 
             template<
                 typename InputT,
-                typename FinderT,
                 typename FormatterT,
                 typename FindResultT,
                 typename FormatResultT >
             inline void find_format_impl2( 
                 InputT& Input,
-                FinderT,
                 FormatterT Formatter,
                 const FindResultT& FindResult,
                 const FormatResultT& FormatResult)

@@ -3,13 +3,15 @@
 
     http://www.boost.org/
 
-    Copyright (c) 2001-2005 Hartmut Kaiser. Distributed under the Boost
+    Copyright (c) 2001-2008 Hartmut Kaiser. Distributed under the Boost
     Software License, Version 1.0. (See accompanying file
     LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 
 #if !defined(CPP_DEFINED_GRAMMAR_HPP_F48287B2_DC67_40A8_B4A1_800EFBD67869_INCLUDED)
 #define CPP_DEFINED_GRAMMAR_HPP_F48287B2_DC67_40A8_B4A1_800EFBD67869_INCLUDED
+
+#include <boost/wave/wave_config.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/spirit/core.hpp>
@@ -19,7 +21,6 @@
 #include <boost/spirit/actor/push_back_actor.hpp>
 #endif // SPIRIT_VERSION >= 0x1700
 
-#include <boost/wave/wave_config.hpp>
 #include <boost/wave/token_ids.hpp>
 #include <boost/wave/util/pattern_parser.hpp>
 #include <boost/wave/grammars/cpp_defined_grammar_gen.hpp>
@@ -33,6 +34,11 @@
 #define spirit_assign_actor(actor) boost::spirit::assign(actor)
 #endif // SPIRIT_VERSION >= 0x1700
 #endif // !defined(spirit_append_actor)
+
+// this must occur after all of the includes and before any code appears
+#ifdef BOOST_HAS_ABI_HEADERS
+#include BOOST_ABI_PREFIX
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace boost {
@@ -91,6 +97,10 @@ struct defined_grammar :
                         spirit_append_actor(self.result_seq)
                     ] 
                 |   pattern_p(OperatorTokenType|AltExtTokenType, ExtTokenTypeMask)
+                    [
+                        spirit_append_actor(self.result_seq)
+                    ] 
+                |   pattern_p(BoolLiteralTokenType, TokenTypeMask)
                     [
                         spirit_append_actor(self.result_seq)
                     ] 
@@ -172,5 +182,10 @@ defined_grammar_gen<LexIteratorT>::parse_operator_defined (
 }   // namespace grammars
 }   // namespace wave
 }   // namespace boost
+
+// the suffix header occurs after all of the code
+#ifdef BOOST_HAS_ABI_HEADERS
+#include BOOST_ABI_SUFFIX
+#endif
 
 #endif // !defined(CPP_DEFINED_GRAMMAR_HPP_F48287B2_DC67_40A8_B4A1_800EFBD67869_INCLUDED)

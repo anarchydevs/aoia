@@ -20,6 +20,7 @@
 #define CREF
 #endif
 
+#include <climits>
 #include <boost/spirit/phoenix/actor.hpp>
 #include <boost/spirit/phoenix/composite.hpp>
 #include <boost/config.hpp>
@@ -239,7 +240,7 @@ struct unary_operator<positive_op, T> {
 template <typename T>
 struct unary_operator<logical_not_op, T> {
 
-    typedef bool result_type;
+    typedef T const result_type;
     static result_type eval(T const& v)
     { return !v; }
 };

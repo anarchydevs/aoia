@@ -144,7 +144,7 @@ basic_xml_oarchive<Archive>::end_preamble(){
         pending_preamble = false;
     }
 }
-
+#if 0
 template<class Archive>
 BOOST_ARCHIVE_OR_WARCHIVE_DECL(void)
 basic_xml_oarchive<Archive>::save_override(const object_id_type & t, int)
@@ -168,6 +168,29 @@ basic_xml_oarchive<Archive>::save_override(const version_type & t, int)
     int i = t.t; // extra .t is for borland
     write_attribute(VERSION(), i);
 }
+#endif
+
+template<class Archive>
+BOOST_ARCHIVE_OR_WARCHIVE_DECL(void)
+basic_xml_oarchive<Archive>::save_override(const object_id_type & t, int)
+{
+    write_attribute(OBJECT_ID(), t, "=\"_");
+}
+template<class Archive>
+BOOST_ARCHIVE_OR_WARCHIVE_DECL(void)
+basic_xml_oarchive<Archive>::save_override(
+    const object_reference_type & t,
+    int
+){
+    write_attribute(OBJECT_REFERENCE(), t, "=\"_");
+}
+template<class Archive>
+BOOST_ARCHIVE_OR_WARCHIVE_DECL(void)
+basic_xml_oarchive<Archive>::save_override(const version_type & t, int)
+{
+    write_attribute(VERSION(), t);
+}
+
 template<class Archive>
 BOOST_ARCHIVE_OR_WARCHIVE_DECL(void)
 basic_xml_oarchive<Archive>::save_override(const class_id_type & t, int)
@@ -199,11 +222,12 @@ basic_xml_oarchive<Archive>::save_override(const class_name_type & t, int)
         return;
     write_attribute(CLASS_NAME(), key);
 }
+
 template<class Archive>
 BOOST_ARCHIVE_OR_WARCHIVE_DECL(void)
 basic_xml_oarchive<Archive>::save_override(const tracking_type & t, int)
 {
-    write_attribute(TRACKING(), t.t); // extra .t is for borland
+    write_attribute(TRACKING(), t.t);
 }
 
 template<class Archive>
@@ -234,7 +258,7 @@ BOOST_ARCHIVE_OR_WARCHIVE_DECL(BOOST_PP_EMPTY())
 basic_xml_oarchive<Archive>::~basic_xml_oarchive(){
     if(0 == (this->get_flags() & no_header)){
         BOOST_TRY{
-                this->This()->put("</boost_serialization>\n");
+                this->This()->put("</boost_serialization>");
         }
         BOOST_CATCH(...){}
         BOOST_CATCH_END

@@ -20,7 +20,7 @@
         //Currently only implemented for Win32, but should
             //later be implemented for all platforms.
         //Used by Win32 implementation of Boost.Threads
-            //tss to peform cleanup.
+            //tss to perform cleanup.
         //Like the C runtime library atexit() function,
             //which it mimics, at_thread_exit() returns
             //zero if successful and a nonzero
@@ -67,7 +67,7 @@
         //Called automatically by Boost.Threads when
             //a method for doing so has been discovered.
         //Must not be omitted; may be called multiple times.
-
+    
     extern "C" void tss_cleanup_implemented(void);
         //Dummy function used both to detect whether tss cleanup
             //cleanup has been implemented and to force
