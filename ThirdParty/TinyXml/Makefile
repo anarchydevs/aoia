@@ -8,14 +8,14 @@
 #****************************************************************************
 
 # DEBUG can be set to YES to include debugging info, or NO otherwise
-DEBUG          := NO
+DEBUG          := YES
 
 # PROFILE can be set to YES to include profiling info, or NO otherwise
 PROFILE        := NO
 
 # TINYXML_USE_STL can be used to turn on STL support. NO, then STL
 # will not be used. YES will include the STL files.
-TINYXML_USE_STL := NO
+TINYXML_USE_STL := YES
 
 #****************************************************************************
 
@@ -25,7 +25,7 @@ LD     := g++
 AR     := ar rc
 RANLIB := ranlib
 
-DEBUG_CFLAGS     := -Wall -Wno-unknown-pragmas -Wno-format -g -DDEBUG
+DEBUG_CFLAGS     := -Wall -Wno-format -g -DDEBUG
 RELEASE_CFLAGS   := -Wall -Wno-unknown-pragmas -Wno-format -O3
 
 LIBS		 :=
@@ -114,6 +114,9 @@ ${OUTPUT}: ${OBJS}
 
 %.o : %.c
 	${CC} -c ${CFLAGS} ${INCS} $< -o $@
+
+dist:
+	bash makedistlinux
 
 clean:
 	-rm -f core ${OBJS} ${OUTPUT}

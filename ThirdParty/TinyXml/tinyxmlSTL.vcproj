@@ -4,7 +4,8 @@
 	Version="9,00"
 	Name="tinyxmlSTL"
 	ProjectGUID="{CE5A4E99-9463-4DD4-B0F4-A4C36168B0C2}"
-	TargetFrameworkVersion="131072"
+	RootNamespace="tinyxmlSTL"
+	TargetFrameworkVersion="0"
 	>
 	<Platforms>
 		<Platform
@@ -19,7 +20,6 @@
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="4"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
 			CharacterSet="2"
@@ -42,14 +42,16 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;TIXML_USE_STL"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;TIXML_USE_STL;"
+				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
 				PrecompiledHeaderFile=".\Debug_STL/tinyxmlSTL.pch"
 				AssemblerListingLocation=".\Debug_STL/"
 				ObjectFile=".\Debug_STL/"
 				ProgramDataBaseFileName=".\Debug_STL/"
-				WarningLevel="3"
+				BrowseInformation="1"
+				WarningLevel="4"
 				SuppressStartupBanner="true"
 				DebugInformationFormat="4"
 			/>
@@ -77,6 +79,8 @@
 			/>
 			<Tool
 				Name="VCBscMakeTool"
+				SuppressStartupBanner="true"
+				OutputFile=".\Debug_STL/tinyxmlSTL.bsc"
 			/>
 			<Tool
 				Name="VCFxCopTool"
@@ -90,7 +94,6 @@
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="4"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
 			CharacterSet="2"
@@ -150,6 +153,8 @@
 			/>
 			<Tool
 				Name="VCBscMakeTool"
+				SuppressStartupBanner="true"
+				OutputFile=".\Release_STL/tinyxmlSTL.bsc"
 			/>
 			<Tool
 				Name="VCFxCopTool"
