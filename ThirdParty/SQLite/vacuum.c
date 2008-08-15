@@ -14,32 +14,20 @@
 ** Most of the code in this file may be omitted by defining the
 ** SQLITE_OMIT_VACUUM macro.
 **
-** $Id: vacuum.c,v 1.63 2006/09/21 11:02:18 drh Exp $
+** $Id: vacuum.c,v 1.81 2008/07/08 19:34:07 drh Exp $
 */
 #include "sqliteInt.h"
 #include "vdbeInt.h"
-#include "os.h"
 
-#ifndef SQLITE_OMIT_VACUUM
-/*
-** Generate a random name of 20 character in length.
-*/
-static void randomName(unsigned char *zBuf){
-  static const unsigned char zChars[] =
-    "abcdefghijklmnopqrstuvwxyz"
-    "0123456789";
-  int i;
-  sqlite3Randomness(20, zBuf);
-  for(i=0; i<20; i++){
-    zBuf[i] = zChars[ zBuf[i]%(sizeof(zChars)-1) ];
-  }
-}
-
+#if !defined(SQLITE_OMIT_VACUUM) && !defined(SQLITE_OMIT_ATTACH)
 /*
 ** Execute zSql on database db. Return an error code.
 */
 static int execSql(sqlite3 *db, const char *zSql){
   sqlite3_stmt *pStmt;
+  if( !zSql ){
+    return SQLITE_NOMEM;
+  }
   if( SQLITE_OK!=sqlite3_prepare(db, zSql, -1, &pStmt, 0) ){
     return sqlite3_errcode(db);
   }
@@ -82,7 +70,7 @@ static int execExecSql(sqlite3 *db, const char *zSql){
 void sqlite3Vacuum(Parse *pParse){
   Vdbe *v = sqlite3GetVdbe(pParse);
   if( v ){
-    sqlite3VdbeAddOp(v, OP_Vacuum, 0, 0);
+    sqlite3VdbeAddOp2(v, OP_Vacuum, 0, 0);
   }
   return;
 }
@@ -92,59 +80,27 @@ void sqlite3Vacuum(Parse *pParse){
 */
 int sqlite3RunVacuum(char **pzErrMsg, sqlite3 *db){
   int rc = SQLITE_OK;     /* Return code from service routines */
-  const char *zFilename;  /* full pathname of the database file */
-  int nFilename;          /* number of characters  in zFilename[] */
-  char *zTemp = 0;        /* a temporary file in same directory as zFilename */
   Btree *pMain;           /* The database being vacuumed */
-  Btree *pTemp;
-  char *zSql = 0;
-  int saved_flags;       /* Saved value of the db->flags */
-  Db *pDb = 0;           /* Database to detach at end of vacuum */
+  Btree *pTemp;           /* The temporary database we vacuum into */
+  char *zSql = 0;         /* SQL statements */
+  int saved_flags;        /* Saved value of the db->flags */
+  int saved_nChange;      /* Saved value of db->nChange */
+  int saved_nTotalChange; /* Saved value of db->nTotalChange */
+  Db *pDb = 0;            /* Database to detach at end of vacuum */
+  int nRes;
 
   /* Save the current value of the write-schema flag before setting it. */
   saved_flags = db->flags;
+  saved_nChange = db->nChange;
+  saved_nTotalChange = db->nTotalChange;
   db->flags |= SQLITE_WriteSchema | SQLITE_IgnoreChecks;
 
   if( !db->autoCommit ){
-    sqlite3SetString(pzErrMsg, "cannot VACUUM from within a transaction", 
-       (char*)0);
+    sqlite3SetString(pzErrMsg, db, "cannot VACUUM from within a transaction");
     rc = SQLITE_ERROR;
     goto end_of_vacuum;
   }
-
-  /* Get the full pathname of the database file and create a
-  ** temporary filename in the same directory as the original file.
-  */
   pMain = db->aDb[0].pBt;
-  zFilename = sqlite3BtreeGetFilename(pMain);
-  assert( zFilename );
-  if( zFilename[0]=='\0' ){
-    /* The in-memory database. Do nothing. Return directly to avoid causing
-    ** an error trying to DETACH the vacuum_db (which never got attached)
-    ** in the exit-handler.
-    */
-    return SQLITE_OK;
-  }
-  nFilename = strlen(zFilename);
-  zTemp = sqliteMalloc( nFilename+100 );
-  if( zTemp==0 ){
-    rc = SQLITE_NOMEM;
-    goto end_of_vacuum;
-  }
-  strcpy(zTemp, zFilename);
-
-  /* The randomName() procedure in the following loop uses an excellent
-  ** source of randomness to generate a name from a space of 1.3e+31 
-  ** possibilities.  So unless the directory already contains on the order
-  ** of 1.3e+31 files, the probability that the following loop will
-  ** run more than once or twice is vanishingly small.  We are certain
-  ** enough that this loop will always terminate (and terminate quickly)
-  ** that we don't even bother to set a maximum loop count.
-  */
-  do {
-    zTemp[nFilename] = '-';
-    randomName((unsigned char*)&zTemp[nFilename+1]);
-  } while( sqlite3OsFileExists(zTemp) );
 
   /* Attach the temporary database as 'vacuum_db'. The synchronous pragma
   ** can be set to 'off' for this file, as it is not recovered if a crash
@@ -153,29 +109,48 @@ int sqlite3RunVacuum(char **pzErrMsg, sqlite3 *db){
   ** sqlite3BtreeCopyFile() is called.
   **
   ** An optimisation would be to use a non-journaled pager.
+  ** (Later:) I tried setting "PRAGMA vacuum_db.journal_mode=OFF" but
+  ** that actually made the VACUUM run slower.  Very little journalling
+  ** actually occurs when doing a vacuum since the vacuum_db is initially
+  ** empty.  Only the journal header is written.  Apparently it takes more
+  ** time to parse and run the PRAGMA to turn journalling off than it does
+  ** to write the journal header file.
   */
-  zSql = sqlite3MPrintf("ATTACH '%q' AS vacuum_db;", zTemp);
-  if( !zSql ){
-    rc = SQLITE_NOMEM;
-    goto end_of_vacuum;
-  }
+  zSql = "ATTACH '' AS vacuum_db;";
   rc = execSql(db, zSql);
-  sqliteFree(zSql);
-  zSql = 0;
   if( rc!=SQLITE_OK ) goto end_of_vacuum;
   pDb = &db->aDb[db->nDb-1];
   assert( strcmp(db->aDb[db->nDb-1].zName,"vacuum_db")==0 );
   pTemp = db->aDb[db->nDb-1].pBt;
-  sqlite3BtreeSetPageSize(pTemp, sqlite3BtreeGetPageSize(pMain),
-     sqlite3BtreeGetReserve(pMain));
-  assert( sqlite3BtreeGetPageSize(pTemp)==sqlite3BtreeGetPageSize(pMain) );
+
+  nRes = sqlite3BtreeGetReserve(pMain);
+
+  /* A VACUUM cannot change the pagesize of an encrypted database. */
+#ifdef SQLITE_HAS_CODEC
+  if( db->nextPagesize ){
+    extern void sqlite3CodecGetKey(sqlite3*, int, void**, int*);
+    int nKey;
+    char *zKey;
+    sqlite3CodecGetKey(db, 0, (void**)&zKey, &nKey);
+    if( nKey ) db->nextPagesize = 0;
+  }
+#endif
+
+  if( sqlite3BtreeSetPageSize(pTemp, sqlite3BtreeGetPageSize(pMain), nRes)
+   || sqlite3BtreeSetPageSize(pTemp, db->nextPagesize, nRes)
+   || db->mallocFailed 
+  ){
+    rc = SQLITE_NOMEM;
+    goto end_of_vacuum;
+  }
   rc = execSql(db, "PRAGMA vacuum_db.synchronous=OFF");
   if( rc!=SQLITE_OK ){
     goto end_of_vacuum;
   }
 
 #ifndef SQLITE_OMIT_AUTOVACUUM
-  sqlite3BtreeSetAutoVacuum(pTemp, sqlite3BtreeGetAutoVacuum(pMain));
+  sqlite3BtreeSetAutoVacuum(pTemp, db->nextAutovac>=0 ? db->nextAutovac :
+                                           sqlite3BtreeGetAutoVacuum(pMain));
 #endif
 
   /* Begin a transaction */
@@ -186,17 +161,17 @@ int sqlite3RunVacuum(char **pzErrMsg, sqlite3 *db){
   ** in the temporary database.
   */
   rc = execExecSql(db, 
-      "SELECT 'CREATE TABLE vacuum_db.' || substr(sql,14,100000000) "
+      "SELECT 'CREATE TABLE vacuum_db.' || substr(sql,14) "
       "  FROM sqlite_master WHERE type='table' AND name!='sqlite_sequence'"
       "   AND rootpage>0"
   );
   if( rc!=SQLITE_OK ) goto end_of_vacuum;
   rc = execExecSql(db, 
-      "SELECT 'CREATE INDEX vacuum_db.' || substr(sql,14,100000000)"
+      "SELECT 'CREATE INDEX vacuum_db.' || substr(sql,14)"
       "  FROM sqlite_master WHERE sql LIKE 'CREATE INDEX %' ");
   if( rc!=SQLITE_OK ) goto end_of_vacuum;
   rc = execExecSql(db, 
-      "SELECT 'CREATE UNIQUE INDEX vacuum_db.' || substr(sql,21,100000000) "
+      "SELECT 'CREATE UNIQUE INDEX vacuum_db.' || substr(sql,21) "
       "  FROM sqlite_master WHERE sql LIKE 'CREATE UNIQUE INDEX %'");
   if( rc!=SQLITE_OK ) goto end_of_vacuum;
 
@@ -286,9 +261,15 @@ int sqlite3RunVacuum(char **pzErrMsg, sqlite3 *db){
     rc = sqlite3BtreeCommit(pMain);
   }
 
+  if( rc==SQLITE_OK ){
+    rc = sqlite3BtreeSetPageSize(pMain, sqlite3BtreeGetPageSize(pTemp), nRes);
+  }
+
 end_of_vacuum:
   /* Restore the original value of db->flags */
   db->flags = saved_flags;
+  db->nChange = saved_nChange;
+  db->nTotalChange = saved_nTotalChange;
 
   /* Currently there is an SQL level transaction open on the vacuum
   ** database. No locks are held on any other files (since the main file
@@ -300,20 +281,13 @@ end_of_vacuum:
   db->autoCommit = 1;
 
   if( pDb ){
-    sqlite3MallocDisallow();
     sqlite3BtreeClose(pDb->pBt);
-    sqlite3MallocAllow();
     pDb->pBt = 0;
     pDb->pSchema = 0;
   }
 
-  if( zTemp ){
-    sqlite3OsDelete(zTemp);
-    sqliteFree(zTemp);
-  }
-  sqliteFree( zSql );
   sqlite3ResetInternalSchema(db, 0);
 
   return rc;
 }
-#endif  /* SQLITE_OMIT_VACUUM */
+#endif  /* SQLITE_OMIT_VACUUM && SQLITE_OMIT_ATTACH */
