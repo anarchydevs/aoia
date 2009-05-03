@@ -4,7 +4,7 @@
 #include <QtGui/QMainWindow>
 #include "ui_itemassistant.h"
 #include "PluginInterface.h"
-
+#include "datamanager.h"
 
 namespace aoia {
 
@@ -18,9 +18,11 @@ namespace aoia {
 
     private:
         void loadPlugins();
+        void initPlugin(PluginInterface* plugin);
         void registerPlugin(PluginInterface* plugin);
 
         Ui::ItemAssistantClass ui;
+        DataManager* m_dataManager;
     };
 
 }   // namespace
