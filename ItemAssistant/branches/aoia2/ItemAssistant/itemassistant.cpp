@@ -9,6 +9,7 @@ namespace aoia {
 
     ItemAssistant::ItemAssistant(QWidget *parent, Qt::WFlags flags)
         : QMainWindow(parent, flags)
+        , m_dataManager(new DataManager(parent))
     {
         ui.setupUi(this);
 
@@ -59,24 +60,20 @@ namespace aoia {
             {
                 continue;
             }
-            registerPlugin(aoiaPlugin);
+            initPlugin(aoiaPlugin);
         }
     }
 
 
-    void ItemAssistant::initPlugin(PluginInterface &plugin)
+    void ItemAssistant::initPlugin(PluginInterface* plugin)
     {
-
+        plugin->initPlugin(m_dataManager);
+        registerPlugin(plugin);
     }
 
 
     void ItemAssistant::registerPlugin(PluginInterface* plugin)
     {
-        if (!plugin)
-        {
-            return;
-        }
-
         foreach (GuiPluginInterface* guiPlugin, plugin->getGuiPlugins())
         {
             QWidget* widget = guiPlugin->getMainWidget(ui.mainWidgetStack);

@@ -171,10 +171,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\inventorytracker.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\inventorytrackerplugin.cpp"
 				>
 			</File>
@@ -235,10 +231,6 @@
 						Outputs="&quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\inventorytracker.h"
-				>
 			</File>
 			<File
 				RelativePath=".\inventorytracker_global.h"
@@ -317,25 +309,6 @@
 			SourceControlFiles="false"
 			>
 			<File
-				RelativePath=".\GeneratedFiles\Release\moc_inventorybrowserplugin.cpp"
-				>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
 				RelativePath=".\GeneratedFiles\Debug\moc_inventorybrowserplugin.cpp"
 				>
 				<FileConfiguration
@@ -346,8 +319,25 @@
 						Name="VCCLCompilerTool"
 					/>
 				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\GeneratedFiles\Release\moc_inventorybrowserplugin.cpp"
+				>
 				<FileConfiguration
 					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\GeneratedFiles\Release\moc_inventorylistview.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="true"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -365,24 +355,10 @@
 						Name="VCCLCompilerTool"
 					/>
 				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\GeneratedFiles\Release\moc_inventorylistview.cpp"
+				RelativePath=".\GeneratedFiles\Release\moc_inventorytrackerplugin.cpp"
 				>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
 					ExcludedFromBuild="true"
@@ -397,32 +373,6 @@
 				>
 				<FileConfiguration
 					Name="Release|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\GeneratedFiles\Release\moc_inventorytrackerplugin.cpp"
-				>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|Win32"
 					ExcludedFromBuild="true"
 					>
 					<Tool
