@@ -30,7 +30,7 @@ have contributed either directly or indirectly include:
 
 Change Log:
 ===========
-Version 0.9.3										Release Date: ??/?/2009
+Version 0.9.3										Release Date: 4/5/2009
 	* Added support for NPC trade-in quest rewards in the item tracking.
     * Now parsing the 18.0.1 database correctly.
     * Find panel now filters on dimension as well.
