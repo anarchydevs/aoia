@@ -1,9 +1,10 @@
 #ifndef PLUGINMANAGER_H
 #define PLUGINMANAGER_H
 
+#include <ItemAssistantCore/PluginInterface.h>
 #include <ItemAssistantCore/Singleton.h>
 #include <ItemAssistantCore/itemassistantcore_global.h>
-#include <vector>
+#include <QVector>
 
 
 namespace aoia {
@@ -15,8 +16,10 @@ namespace aoia {
         ~PluginManager();
 
         void loadPlugins();
+        void initPlugins();
 
     private:
+        QVector<PluginInterface*> m_plugins;
     };
 
 }   // namespace

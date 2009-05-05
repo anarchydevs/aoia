@@ -3,7 +3,7 @@
 
 #include <QtGui/QMainWindow>
 #include "ui_itemassistant.h"
-#include "PluginInterface.h"
+#include <ItemAssistantCore/PluginInterface.h>
 #include "datamanager.h"
 
 namespace aoia {

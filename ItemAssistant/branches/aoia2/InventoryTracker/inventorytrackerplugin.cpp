@@ -17,7 +17,7 @@ namespace aoia { namespace inventory {
     }
 
 
-    void InventoryTrackerPlugin::initPlugin(DataManagerInterface* dbManager)
+    void InventoryTrackerPlugin::initPlugin()
     {
     }
 
