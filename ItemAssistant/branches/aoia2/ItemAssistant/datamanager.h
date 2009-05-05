@@ -24,14 +24,14 @@ namespace aoia {
             unsigned short flags, unsigned short stack, unsigned int parent, unsigned short slot, 
             unsigned int children, unsigned int owner);
         virtual OwnedItemInfo getOwnedItemInfo(unsigned int itemID);
-        virtual void setToonName(unsigned int charid, Qstring const& newName);
-        virtual Qstring getToonName(unsigned int charid) const;
+        virtual void setToonName(unsigned int charid, QString const& newName);
+        virtual QString getToonName(unsigned int charid) const;
         virtual void setToonShopId(unsigned int charid, unsigned int shopid);
         virtual unsigned int getToonShopId(unsigned int charid) const;
         virtual unsigned int getShopOwner(unsigned int shopid);
         virtual void setToonDimension(unsigned int charid, unsigned int dimensionid);
         virtual unsigned int getToonDimension(unsigned int charid) const;
-        virtual bool getDimensions(std::map<unsigned int, std::tstring> &dimensions) const;
+        virtual bool getDimensions(QMap<unsigned int, QString> &dimensions) const;
         virtual unsigned int findNextAvailableContainerSlot(unsigned int charId, unsigned int containerId);
         virtual unsigned int getItemProperties(unsigned int charId, unsigned int containerId, 
             unsigned int slot);
