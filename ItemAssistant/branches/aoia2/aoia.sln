@@ -5,6 +5,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ItemAssistant", "ItemAssist
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "InventoryTracker", "InventoryTracker\InventoryTracker.vcproj", "{0B7C6904-722E-47E0-80DC-88A47B318164}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ItemAssistantCore", "ItemAssistantCore\ItemAssistantCore.vcproj", "{EC06995F-9C74-4C87-9220-61D4A8B7A6D3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -19,6 +21,10 @@ Global
 		{0B7C6904-722E-47E0-80DC-88A47B318164}.Debug|Win32.Build.0 = Debug|Win32
 		{0B7C6904-722E-47E0-80DC-88A47B318164}.Release|Win32.ActiveCfg = Release|Win32
 		{0B7C6904-722E-47E0-80DC-88A47B318164}.Release|Win32.Build.0 = Release|Win32
+		{EC06995F-9C74-4C87-9220-61D4A8B7A6D3}.Debug|Win32.ActiveCfg = Debug|Win32
+		{EC06995F-9C74-4C87-9220-61D4A8B7A6D3}.Debug|Win32.Build.0 = Debug|Win32
+		{EC06995F-9C74-4C87-9220-61D4A8B7A6D3}.Release|Win32.ActiveCfg = Release|Win32
+		{EC06995F-9C74-4C87-9220-61D4A8B7A6D3}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
