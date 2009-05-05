@@ -2,6 +2,7 @@
 #define DATAMANAGERINTERFACE_H
 
 #include <QString>
+#include <QMap>
 
 namespace aoia {
 
@@ -52,7 +53,7 @@ namespace aoia {
         virtual unsigned int getToonDimension(unsigned int charid) const = 0;
 
         /// Retrieves all the dimension IDs and their descriptions. Returns false if query failed.
-        virtual bool getDimensions(std::map<unsigned int, QString> &dimensions) const = 0;
+        virtual bool getDimensions(QMap<unsigned int, QString> &dimensions) const = 0;
 
         /// Determines the first available container slot ID for a specified character and container.
         virtual unsigned int findNextAvailableContainerSlot(unsigned int charId, unsigned int containerId) = 0;
