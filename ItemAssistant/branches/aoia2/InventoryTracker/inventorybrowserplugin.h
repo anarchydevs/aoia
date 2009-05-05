@@ -2,7 +2,7 @@
 #define INVENTORYBROWSERPLUGIN_H
 
 #include <QObject>
-#include <ItemAssistant/PluginInterface.h>
+#include <ItemAssistantCore/PluginInterface.h>
 
 namespace aoia { namespace inventory {
 

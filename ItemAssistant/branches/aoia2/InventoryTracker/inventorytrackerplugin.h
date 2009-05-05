@@ -3,7 +3,7 @@
 
 #include "inventorytracker_global.h"
 #include <QObject>
-#include <ItemAssistant/PluginInterface.h>
+#include <ItemAssistantCore/PluginInterface.h>
 
 
 namespace aoia { namespace inventory {
@@ -19,7 +19,7 @@ namespace aoia { namespace inventory {
         InventoryTrackerPlugin();
         ~InventoryTrackerPlugin();
 
-        virtual void initPlugin(DataManagerInterface* dbManager);
+        virtual void initPlugin();
         virtual QList<MessageHandlerInterface*> getMessageHandlers() const;
         virtual QList<GuiPluginInterface*> getGuiPlugins() const;
     };

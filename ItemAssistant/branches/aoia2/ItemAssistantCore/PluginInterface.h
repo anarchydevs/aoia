@@ -1,7 +1,9 @@
 #ifndef PLUGININTERFACE_H
 #define PLUGININTERFACE_H
 
-#include <ItemAssistant/DataManagerInterface.h>
+#include <QtPlugin>
+#include <QWidget>
+
 
 namespace aoia {
 
@@ -29,9 +31,7 @@ namespace aoia {
     public:
         virtual ~PluginInterface() {}
 
-        virtual void initPlugin(DataManagerInterface* dbManager) = 0;
-        virtual QList<MessageHandlerInterface*> getMessageHandlers() const = 0;
-        virtual QList<GuiPluginInterface*> getGuiPlugins() const = 0;
+        virtual void initPlugin() = 0;
     };
 
 }
