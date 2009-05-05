@@ -17,12 +17,7 @@ namespace aoia {
         ~ItemAssistant();
 
     private:
-        void loadPlugins();
-        void initPlugin(PluginInterface* plugin);
-        void registerPlugin(PluginInterface* plugin);
-
         Ui::ItemAssistantClass ui;
-        DataManager* m_dataManager;
     };
 
 }   // namespace
