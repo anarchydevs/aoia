@@ -6,6 +6,7 @@
 #include <QTextStream>
 #include <QString>
 #include <QFile>
+#include <Windows.h>
 
 
 namespace aoia {
@@ -37,8 +38,9 @@ namespace aoia {
     QTextStream stream(&msg); \
     stream << (streamdef) << "\n"; \
     stream.flush(); \
-    OutputDebugString(msg.toStdString().c_str()); \
 }
+//    OutputDebugString(msg.toStdWString().c_str()); \
+//}
 
 #define LOG(streamdef) \
 { \
@@ -47,9 +49,10 @@ namespace aoia {
     stream << (streamdef); \
     stream.flush(); \
     Logger::instance().log(msg); \
-    msg += "\n"; \
-    OutputDebugString(msg.toStdString().c_str()); \
 }
+//    msg += "\n"; \
+//    OutputDebugString(msg.toStdWString().c_str()); \
+//}
 
 #else
 
@@ -58,7 +61,10 @@ namespace aoia {
 
 #define LOG(streamdef) \
 { \
-    QString msg = (((std::tostringstream&)(std::tostringstream().flush() << streamdef)).str()); \
+    QString msg; \
+    QTextStream stream(&msg); \
+    stream << (streamdef); \
+    stream.flush(); \
     Logger::instance().log(msg); \
 }
 

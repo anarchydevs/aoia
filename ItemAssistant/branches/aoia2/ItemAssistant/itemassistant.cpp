@@ -7,7 +7,6 @@ namespace aoia {
 
     ItemAssistant::ItemAssistant(QWidget *parent, Qt::WFlags flags)
         : QMainWindow(parent, flags)
-        , m_dataManager(new DataManager(parent))
     {
         ui.setupUi(this);
 

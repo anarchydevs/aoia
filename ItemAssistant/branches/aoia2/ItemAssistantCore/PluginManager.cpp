@@ -2,6 +2,7 @@
 #include <QPluginLoader>
 #include <QDir>
 #include <QApplication>
+#include "Logger.h"
 
 
 namespace aoia {
@@ -11,6 +12,7 @@ namespace aoia {
 
     PluginManager::PluginManager()
     {
+        LOG("PluginManager: created");
     }
 
 
@@ -21,6 +23,7 @@ namespace aoia {
 
     PluginManager::~PluginManager()
     {
+        LOG("PluginManager: destroyed");
     }
 
 
@@ -54,11 +57,13 @@ namespace aoia {
             }
             m_plugins += aoiaPlugin;
         }
+        LOG(QString("PluginManager: %1 plugins loaded").arg(m_plugins.size()));
     }
 
 
     void PluginManager::initPlugins()
     {
+        LOG("PluginManager: initializing plugins");
         foreach(PluginInterface* plugin, m_plugins)
         {
             plugin->initPlugin();
