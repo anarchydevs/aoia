@@ -1,4 +1,6 @@
 <RCC>
-    <qresource prefix="ItemAssistant">
+    <qresource prefix="/ItemAssistant" >
+        <file>Resources/Help.png</file>
+        <file>Resources/Web.png</file>
     </qresource>
 </RCC>
