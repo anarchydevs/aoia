@@ -287,10 +287,10 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						Description=""
-						CommandLine=""
-						AdditionalDependencies=""
-						Outputs=""
+						Description="Rcc&apos;ing $(InputPath)..."
+						CommandLine="&quot;$(QTDIR)\bin\rcc.exe&quot; -name &quot;$(InputName)&quot; -no-compress &quot;$(InputPath)&quot; -o .\GeneratedFiles\qrc_$(InputName).cpp&#x0D;&#x0A;"
+						AdditionalDependencies="$(InputPath)"
+						Outputs=".\GeneratedFiles\qrc_$(InputName).cpp"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -298,10 +298,10 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						Description=""
-						CommandLine=""
-						AdditionalDependencies=""
-						Outputs=""
+						Description="Rcc&apos;ing $(InputPath)..."
+						CommandLine="&quot;$(QTDIR)\bin\rcc.exe&quot; -name &quot;$(InputName)&quot; -no-compress &quot;$(InputPath)&quot; -o .\GeneratedFiles\qrc_$(InputName).cpp&#x0D;&#x0A;"
+						AdditionalDependencies="$(InputPath)"
+						Outputs=".\GeneratedFiles\qrc_$(InputName).cpp"
 					/>
 				</FileConfiguration>
 			</File>
@@ -385,6 +385,26 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\GeneratedFiles\qrc_itemassistant.cpp"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
 					/>
 				</FileConfiguration>
 			</File>

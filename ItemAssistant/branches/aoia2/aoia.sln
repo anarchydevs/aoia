@@ -13,6 +13,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "InventoryTracker", "Invento
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ItemAssistantCore", "ItemAssistantCore\ItemAssistantCore.vcproj", "{EC06995F-9C74-4C87-9220-61D4A8B7A6D3}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{0408B615-03E4-4D93-8889-8C864C2D5F6D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -34,6 +36,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{0B7C6904-722E-47E0-80DC-88A47B318164} = {0408B615-03E4-4D93-8889-8C864C2D5F6D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		QtVersion = $(DefaultQtVersion)
