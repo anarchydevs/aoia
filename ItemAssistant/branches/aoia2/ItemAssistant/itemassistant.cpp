@@ -1,7 +1,7 @@
 #include "itemassistant.h"
 #include <QDir>
 #include <QPushButton>
-
+#include <ItemAssistantCore/guimanager.h>
 
 namespace aoia {
 
@@ -19,6 +19,8 @@ namespace aoia {
         {
             ui.sidebarWidgetStack->removeWidget(ui.sidebarWidgetStack->widget(0));
         }
+
+        GuiManager::instance().setParents(ui.mainWidgetStack, ui.sidebarWidgetStack, ui.buttonPanel);
     }
 
 
