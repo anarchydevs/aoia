@@ -1,6 +1,7 @@
 #include "inventorytrackerplugin.h"
 #include <QtPlugin>
 #include "inventorybrowserplugin.h"
+#include <ItemAssistantCore/Logger.h>
 
 
 namespace aoia { namespace inventory {
@@ -9,6 +10,7 @@ namespace aoia { namespace inventory {
 
     InventoryTrackerPlugin::InventoryTrackerPlugin()
     {
+        LOG("Inventory Tracker Plugin loaded");
     }
 
 
@@ -19,6 +21,7 @@ namespace aoia { namespace inventory {
 
     void InventoryTrackerPlugin::initPlugin()
     {
+        LOG("Inventory Tracker Plugin initialized");
     }
 
 
