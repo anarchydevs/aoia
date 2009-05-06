@@ -166,6 +166,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\guimanager.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\itemassistantcore.cpp"
 				>
 			</File>
@@ -186,6 +190,32 @@
 			<File
 				RelativePath=".\AOManager.h"
 				>
+			</File>
+			<File
+				RelativePath=".\guimanager.h"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description=""
+						CommandLine=""
+						AdditionalDependencies=""
+						Outputs=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description=""
+						CommandLine=""
+						AdditionalDependencies=""
+						Outputs=""
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\itemassistantcore.h"

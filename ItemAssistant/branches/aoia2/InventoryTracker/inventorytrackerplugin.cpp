@@ -2,6 +2,9 @@
 #include <QtPlugin>
 #include "inventorybrowserplugin.h"
 #include <ItemAssistantCore/Logger.h>
+#include <ItemAssistantCore/guimanager.h>
+#include "inventorylistview.h"
+#include <QTreeView>
 
 
 namespace aoia { namespace inventory {
@@ -22,6 +25,7 @@ namespace aoia { namespace inventory {
     void InventoryTrackerPlugin::initPlugin()
     {
         LOG("Inventory Tracker Plugin initialized");
+        GuiManager::instance().extendGui(new InventoryListView(), new QTreeView(), "Inventory");
     }
 
 
