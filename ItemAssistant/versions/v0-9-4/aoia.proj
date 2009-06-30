@@ -35,21 +35,32 @@
         <Delete Files="@(OldOutputFiles)" />
     </Target>
 
+    <Target Name="update_version">
+        <Message Text="Updating Version" />
+        <ItemGroup>
+            <VersionFile Include="ItemAssistant/Version.h" />
+        </ItemGroup>
+        <WriteLinesToFile
+            File="@(VersionFile)"
+            Lines="#pragma once;;const std::tstring g_versionNumber = _T(&quot;$(Version))&quot;)%3b;"
+            Overwrite="true" />
+    </Target>
+
     <Target Name="build">
         <Message Text="Building" />
         <VCBuild
             Projects="@(Projects)"
             Configuration="Release|Win32"
-            SolutionFile="ItemAssistant.sln" />
+            SolutionFile="ItemAssistant.sln" 
+            Rebuild="true" />
     </Target>
 
-    <Target Name="package" DependsOnTargets="prepare_build;build">
+    <Target Name="package" DependsOnTargets="prepare_build;update_version;build">
         <Message Text="Packaging" />
         <ItemGroup>
             <Files Include="Release/ItemAssistant.exe" />
             <Files Include="Release/ItemAssistantCore.dll" />
             <Files Include="Release/ItemAssistantHook.dll" />
-            <Files Include="Release/ctreestd.dll" />
             <Files Include="Release/sqlite3.dll" />
             <Files Include="Release/*.manifest" />
             <Files Include="Release/msvc*.dll" />
