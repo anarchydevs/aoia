@@ -11,6 +11,6 @@
 	<Tool
 		Name="VCLinkerTool"
 		AdditionalDependencies="gtestd.lib"
-		AdditionalLibraryDirectories="&quot;$(SolutionDir)Externals\gtest\msvc\gtest\$(ConfigurationName)&quot;"
+		AdditionalLibraryDirectories="&quot;$(SolutionDir)Externals\gtest\msvc\gtest-md\$(ConfigurationName)&quot;"
 	/>
 </VisualStudioPropertySheet>
