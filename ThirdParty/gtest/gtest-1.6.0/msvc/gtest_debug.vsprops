@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioPropertySheet
+	ProjectType="Visual C++"
+	Version="8.00"
+	Name="gtest_debug"
+	InheritedPropertySheets=".\gtest_common.vsprops"
+	>
+	<Tool
+		Name="VCCLCompilerTool"
+		AdditionalIncludeDirectories=""
+	/>
+	<Tool
+		Name="VCLinkerTool"
+		AdditionalDependencies="gtestd.lib"
+		AdditionalLibraryDirectories=""
+	/>
+</VisualStudioPropertySheet>
