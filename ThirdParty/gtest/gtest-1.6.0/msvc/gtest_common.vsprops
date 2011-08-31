@@ -2,7 +2,7 @@
 <VisualStudioPropertySheet
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="gtest"
+	Name="gtest_common"
 	>
 	<Tool
 		Name="VCCLCompilerTool"
@@ -10,7 +10,6 @@
 	/>
 	<Tool
 		Name="VCLinkerTool"
-		AdditionalDependencies="gtestd.lib"
 		AdditionalLibraryDirectories="&quot;$(SolutionDir)Externals\gtest\msvc\gtest-md\$(ConfigurationName)&quot;"
 	/>
 </VisualStudioPropertySheet>
